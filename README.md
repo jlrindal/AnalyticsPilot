@@ -19,6 +19,8 @@ Analytics Pilot is an Electron-based application that connects your Power BI sem
 ### Prerequisites
 
 - Node.js (v14 or higher)
+- Visual Studio Build Tools
+- .NET SDK
 - Power BI Desktop (for local model connections)
 - An AI provider API key (optional for local providers like Ollama)
 
@@ -29,13 +31,21 @@ Analytics Pilot is an Electron-based application that connects your Power BI sem
    git clone https://github.com/jlrindal/AnalyticsPilot.git
    cd AnalyticsPilot
    ```
-
-2. Install dependencies:
+   
+2. Install dependencies ** NOTE: IF INSTALLING IN AN ENVIRONMENT WITH A RESTRICTED IT NETWORK, RUN THIS: set NODE_TLS_REJECT_UNATHORIZED=0, THEN RUN THE BELOW COMMAND AND RESET TO 1 AFTER **:
    ```bash
    npm install
    ```
+   
+3. Build the backend:
+   ```bash
+   # Navigate to the bridge folder (ensure you have dotnet installed)
+   cd bridge
+   # You may have to move this back to the bridge folder, depending upon where it is created (likely in bin/Release/net6.0/win-x64/publish/)
+   dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-3. Start the application:
+
+4. Start the application:
    ```bash
    npm start
    ```
