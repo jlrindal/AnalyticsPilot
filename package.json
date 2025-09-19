@@ -1,0 +1,100 @@
+{
+  "name": "analytics-pilot-electron",
+  "version": "1.1.1",
+  "description": "AI integration for Power BI semantic models",
+  "main": "main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "build-dax": "node build.js",
+    "build-proxy": "cd bridge && build-release.bat",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux",
+    "publish": "electron-builder --publish=always",
+    "wpf:build": "cd \"NEW BUILD\" && dotnet build AnalyticsPilot.sln",
+    "wpf:run": "cd \"NEW BUILD\" && dotnet run --project AnalyticsPilot.WPF.csproj",
+    "wpf:clean": "cd \"NEW BUILD\" && dotnet clean AnalyticsPilot.sln",
+    "wpf:dev": "npm run wpf:build && npm run wpf:run"
+  },
+  "keywords": [
+    "electron",
+    "analytics",
+    "power-bi"
+  ],
+  "author": "Torch Stone LLC/Jeremy Rindal",
+  "license": "SEE LICENSE",
+  "devDependencies": {
+    "electron": "^28.2.3",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "node-fetch": "2.7.0",
+    "node-window-manager": "^2.2.4"
+  },
+  "build": {
+    "appId": "com.analyticspilot.electron",
+    "productName": "Analytics Pilot",
+    "directories": {
+      "output": "dist"
+    },
+    "icon": "assets/icon.ico",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/**/*"
+    ],
+    "nodeGypRebuild": false,
+    "npmRebuild": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "assets/**/*",
+      "node_modules/**/*",
+      "!node_modules/**/test/**/*",
+      "!node_modules/**/tests/**/*",
+      "!node_modules/**/*.test.js",
+      "!node_modules/**/*.spec.js",
+      "!dist/**/*",
+      "!src/**/*",
+      "!tests/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    }
+  }
+}

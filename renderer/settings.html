@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .header h1 {
+            color: #58a6ff;
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #7d8590;
+            font-size: 12px;
+        }
+
+        .configs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .config-tile {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            position: relative;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .config-tile:hover {
+            border-color: #58a6ff;
+            background: #161b22;
+        }
+
+        .config-tile.active {
+            border-color: #238636;
+            background: #0d1e0d;
+        }
+
+        .config-tile.active::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(135deg, #238636, #2ea043);
+            border-radius: 6px;
+            z-index: -1;
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .config-name {
+            font-weight: 600;
+            color: #c9d1d9;
+            font-size: 14px;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .config-tile.active .config-name {
+            color: #aff5b4;
+        }
+
+        .config-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid #30363d;
+            border-radius: 3px;
+            color: #7d8590;
+            cursor: pointer;
+            padding: 4px 6px;
+            font-size: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        .action-btn.edit:hover {
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        .action-btn.delete:hover {
+            border-color: #f85149;
+            color: #f85149;
+        }
+
+        .config-details {
+            color: #7d8590;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .config-model {
+            color: #58a6ff;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .config-url {
+            word-break: break-all;
+            margin-bottom: 3px;
+        }
+
+        .config-saved {
+            opacity: 0.7;
+        }
+
+        .active-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #aff5b4;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .active-dot {
+            width: 6px;
+            height: 6px;
+            background: #2ea043;
+            border-radius: 50%;
+        }
+
+        .add-config-tile {
+            background: #161b22;
+            border: 2px dashed #30363d;
+            border-radius: 6px;
+            padding: 40px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+        }
+
+        .add-config-tile:hover {
+            border-color: #58a6ff;
+            background: #0d1117;
+        }
+
+        .add-icon {
+            color: #7d8590;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .add-config-tile:hover .add-icon {
+            color: #58a6ff;
+        }
+
+        .add-text {
+            color: #7d8590;
+            font-size: 12px;
+        }
+
+        .add-config-tile:hover .add-text {
+            color: #58a6ff;
+        }
+
+        .config-form {
+            display: none;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .form-title {
+            color: #58a6ff;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .close-form {
+            background: none;
+            border: none;
+            color: #7d8590;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+        }
+
+        .close-form:hover {
+            color: #c9d1d9;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #7d8590;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"], input[type="password"], input[type="url"] {
+            width: 100%;
+            padding: 8px 12px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 3px;
+            color: #c9d1d9;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="url"]:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.1);
+        }
+
+        .help-text {
+            color: #7d8590;
+            font-size: 11px;
+            margin-top: 3px;
+            line-height: 1.3;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #30363d;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #30363d;
+            border-radius: 3px;
+            background: #21262d;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn:hover {
+            background: #30363d;
+            border-color: #58a6ff;
+        }
+
+        .btn.primary {
+            background: #238636;
+            border-color: #238636;
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background: #2ea043;
+        }
+
+        .btn.test {
+            background: #1f6feb;
+            border-color: #1f6feb;
+            color: white;
+        }
+
+        .btn.test:hover {
+            background: #388bfd;
+        }
+
+        .status-message {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #1a7f37;
+            border: 1px solid #2ea043;
+            color: #aff5b4;
+        }
+
+        .status-message.error {
+            background: #da3633;
+            border: 1px solid #f85149;
+            color: #ffdcd7;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 1px solid #30363d;
+            border-top: 1px solid #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7d8590;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .empty-subtext {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .models-container {
+            margin-bottom: 10px;
+        }
+
+         .model-item {
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             margin-bottom: 8px;
+             padding: 8px;
+             background: #161b22;
+             border: 1px solid #30363d;
+             border-radius: 3px;
+         }
+
+         .model-input {
+             flex: 1;
+             padding: 8px 12px;
+             background: #161b22;
+             border: 1px solid #30363d;
+             border-radius: 3px;
+             color: #c9d1d9;
+             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+             font-size: 13px;
+             transition: border-color 0.2s ease;
+         }
+
+         .model-input:focus {
+             outline: none;
+             border-color: #58a6ff;
+             box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.1);
+         }
+
+        .default-checkbox {
+            margin-right: 5px;
+        }
+
+        .default-label {
+            color: #7d8590;
+            font-size: 11px;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-model {
+            background: #30363d;
+            border: 1px solid #484f58;
+            color: #7d8590;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            min-width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-model:hover {
+            background: #484f58;
+            color: #c9d1d9;
+        }
+
+        .model-item.default {
+            border-color: #238636;
+            background: rgba(35, 134, 54, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>API Configurations</h1>
+            <div class="subtitle">Manage your AI provider settings</div>
+        </div>
+
+        <!-- Configuration Form (Hidden by default) -->
+        <div class="config-form" id="configForm">
+            <div class="form-header">
+                <div class="form-title" id="formTitle">Add New Configuration</div>
+                <button class="close-form" id="closeForm">&times;</button>
+        </div>
+
+        <form id="apiForm">
+            <div class="form-group">
+                <label for="apiName">Configuration Name</label>
+                <input type="text" id="apiName" placeholder="e.g. OpenAI GPT-4, Claude, Gemini">
+                <div class="help-text">A friendly name to identify this API configuration</div>
+            </div>
+
+            <div class="form-group">
+                <label for="providerType">Provider Type</label>
+                <select id="providerType" style="width: 100%; padding: 8px 12px; background: #161b22; border: 1px solid #30363d; border-radius: 3px; color: #c9d1d9; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px;">
+                    <option value="standard">Standard API</option>
+                    <option value="ollama">Ollama</option>
+                </select>
+                <div class="help-text">Ollama for local models (deepseek-coder, llama, etc.). Test connections may take up to 2 minutes for large models.</div>
+            </div>
+
+            <div class="form-group" id="apiKeyGroup">
+                <label for="apiKey">API Key (Optional for local APIs)</label>
+                <input type="password" id="apiKey" placeholder="Enter your API key (leave empty for local APIs)">
+                <div class="help-text">Required for cloud providers, optional for local APIs</div>
+            </div>
+
+            <div class="form-group">
+                <label for="apiUrl">API URL</label>
+                <input type="url" id="apiUrl" placeholder="https://api.openai.com/v1/chat/completions">
+                <div class="help-text" id="apiUrlHelp">The complete endpoint URL for chat completions</div>
+            </div>
+
+             <div class="form-group">
+                 <label for="models">Models</label>
+                 <div class="models-container" id="modelsContainer">
+                     <!-- Models will be populated here -->
+                 </div>
+                 <button type="button" class="btn" id="addModelBtn" style="margin-top: 10px; width: 100%;">+ Add Model</button>
+                 <div class="help-text">Add one or more model identifiers. The first model will be the default.</div>
+             </div>
+
+            <div class="button-group">
+                <button type="button" class="btn" id="cancelBtn">Cancel</button>
+                <button type="button" class="btn test" id="testBtn">Test Connection</button>
+                <button type="button" class="btn primary" id="saveBtn">Save Config</button>
+            </div>
+
+            <div class="status-message" id="statusMessage"></div>
+        </form>
+        </div>
+
+        <!-- Configurations Grid -->
+        <div class="configs-container" id="configsContainer">
+            <!-- Configs will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        let currentEditingId = null;
+        let allConfigs = [];
+        let activeConfigId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllConfigurations();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('testBtn').addEventListener('click', testConnection);
+            document.getElementById('saveBtn').addEventListener('click', saveConfiguration);
+            document.getElementById('cancelBtn').addEventListener('click', closeForm);
+            document.getElementById('closeForm').addEventListener('click', closeForm);
+            document.getElementById('addModelBtn').addEventListener('click', addModelField);
+            document.getElementById('providerType').addEventListener('change', handleProviderTypeChange);
+        }
+
+        async function loadAllConfigurations() {
+            try {
+                const result = await window.electronAPI.settings.getAllConfigs();
+                allConfigs = result.configs || [];
+                activeConfigId = result.activeConfigId;
+                renderConfigurations();
+            } catch (error) {
+                console.error('Failed to load configurations:', error);
+                renderConfigurations();
+            }
+        }
+
+        function renderConfigurations() {
+            const container = document.getElementById('configsContainer');
+            
+            if (allConfigs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚙️</div>
+                        <div class="empty-text">No API configurations found</div>
+                        <div class="empty-subtext">Add your first configuration to get started with Analytics Pilot</div>
+                    </div>
+                    <div class="configs-grid">
+                        <div class="add-config-tile" onclick="showAddForm()">
+                            <div class="add-icon">+</div>
+                            <div class="add-text">Add Configuration</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="configs-grid">';
+            
+            // Render existing configurations
+            allConfigs.forEach(config => {
+                const isActive = config.id === activeConfigId;
+                const savedDate = new Date(config.savedAt).toLocaleDateString();
+                
+                // Handle both old and new model formats
+                let modelDisplay = 'No models specified';
+                if (config.models && config.models.length > 0) {
+                    if (config.models.length === 1) {
+                        modelDisplay = escapeHtml(config.models[0].name);
+                    } else {
+                        modelDisplay = `${config.models.length} models: ${config.models.map(m => m.name).join(', ').slice(0, 50)}${config.models.map(m => m.name).join(', ').length > 50 ? '...' : ''}`;
+                    }
+                } else if (config.modelName) {
+                    modelDisplay = escapeHtml(config.modelName);
+                }
+                
+                // Add provider type indicator
+                const providerType = config.providerType || 'standard';
+                let providerIndicator = '';
+                switch (providerType) {
+                    case 'ollama':
+                        providerIndicator = ' <span style="color: #2ea043; font-size: 10px;">🏠 OLLAMA</span>';
+                        break;
+                    default:
+                        // Check if it's likely a local API based on URL
+                        const isLocal = config.apiUrl && (config.apiUrl.includes('localhost') || config.apiUrl.includes('127.0.0.1'));
+                        if (isLocal) {
+                            providerIndicator = ' <span style="color: #58a6ff; font-size: 10px;">🏠 LOCAL</span>';
+                        } else {
+                            providerIndicator = ' <span style="color: #7d8590; font-size: 10px;">☁️ CLOUD</span>';
+                        }
+                }
+                
+                html += `
+                    <div class="config-tile ${isActive ? 'active' : ''}" onclick="selectConfig('${config.id}')">
+                        <div class="config-header">
+                            <div class="config-name">${escapeHtml(config.name || 'Unnamed Configuration')}</div>
+                            <div class="config-actions">
+                                <button class="action-btn edit" onclick="event.stopPropagation(); editConfig('${config.id}')" title="Edit">✏️</button>
+                                <button class="action-btn delete" onclick="event.stopPropagation(); deleteConfig('${config.id}')" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="config-details">
+                            <div class="config-model">${modelDisplay}${providerIndicator}</div>
+                            <div class="config-url">${escapeHtml(config.apiUrl || 'No URL specified')}</div>
+                            <div class="config-saved">Saved ${savedDate}</div>
+                        </div>
+                        ${isActive ? '<div class="active-indicator"><div class="active-dot"></div>Active</div>' : ''}
+                    </div>
+                `;
+            });
+            
+            // Add "Add New" tile
+            html += `
+                <div class="add-config-tile" onclick="showAddForm()">
+                    <div class="add-icon">+</div>
+                    <div class="add-text">Add Configuration</div>
+                </div>
+            `;
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function showAddForm() {
+            currentEditingId = null;
+            document.getElementById('formTitle').textContent = 'Add New Configuration';
+            clearForm();
+            addModelField(); // Start with one empty model field
+            document.getElementById('configForm').style.display = 'block';
+            document.getElementById('apiName').focus();
+        }
+
+        function editConfig(configId) {
+            const config = allConfigs.find(c => c.id === configId);
+            if (!config) return;
+
+            currentEditingId = configId;
+            document.getElementById('formTitle').textContent = 'Edit Configuration';
+            
+            document.getElementById('apiName').value = config.name || '';
+            document.getElementById('apiKey').value = config.apiKey || '';
+            document.getElementById('apiUrl').value = config.apiUrl || '';
+            
+            // Set provider type and trigger UI changes
+            const providerType = config.providerType || 'standard';
+            document.getElementById('providerType').value = providerType;
+            handleProviderTypeChange();
+            
+            // Handle models - support both old and new format
+            clearModels();
+            if (config.models && config.models.length > 0) {
+                config.models.forEach((model, index) => {
+                    addModelField(model.name, model.isDefault);
+                });
+            } else if (config.modelName) {
+                // Migrate old format
+                addModelField(config.modelName, true);
+            } else {
+                addModelField(); // Empty field
+            }
+            
+            document.getElementById('configForm').style.display = 'block';
+            document.getElementById('apiName').focus();
+        }
+
+         function addModelField(modelName = '', isDefault = false) {
+             const container = document.getElementById('modelsContainer');
+             const modelIndex = container.children.length;
+             
+             // If this is the first model, make it default
+             if (modelIndex === 0) {
+                 isDefault = true;
+             }
+             
+             const modelDiv = document.createElement('div');
+             modelDiv.className = `model-item ${isDefault ? 'default' : ''}`;
+             
+             modelDiv.innerHTML = `
+                 <input type="text" class="model-input" placeholder="deepseek-coder:latest, gpt-4o, claude-3-5-sonnet-20241022, llama3.2" value="${escapeHtml(modelName)}">
+                 <label class="default-label">
+                     <input type="radio" name="defaultModel" class="default-checkbox" ${isDefault ? 'checked' : ''}>
+                     Default
+                 </label>
+                 <button type="button" class="remove-model" onclick="removeModelField(this)">×</button>
+             `;
+             
+             container.appendChild(modelDiv);
+             
+             // Add event listeners
+             const radio = modelDiv.querySelector('.default-checkbox');
+             radio.addEventListener('change', function() {
+                 if (this.checked) {
+                     updateDefaultModel(modelDiv);
+                 }
+             });
+             
+             return modelDiv;
+         }
+
+        function removeModelField(button) {
+            const container = document.getElementById('modelsContainer');
+            const modelDiv = button.closest('.model-item');
+            const wasDefault = modelDiv.classList.contains('default');
+            
+            // Don't allow removing the last model
+            if (container.children.length <= 1) {
+                return;
+            }
+            
+            modelDiv.remove();
+            
+            // If we removed the default model, make the first one default
+            if (wasDefault && container.children.length > 0) {
+                const firstModel = container.children[0];
+                const radio = firstModel.querySelector('.default-checkbox');
+                radio.checked = true;
+                updateDefaultModel(firstModel);
+            }
+        }
+
+        function updateDefaultModel(selectedDiv) {
+            const container = document.getElementById('modelsContainer');
+            
+            // Remove default class from all models
+            Array.from(container.children).forEach(div => {
+                div.classList.remove('default');
+                const radio = div.querySelector('.default-checkbox');
+                radio.checked = false;
+            });
+            
+            // Set selected as default
+            selectedDiv.classList.add('default');
+            const radio = selectedDiv.querySelector('.default-checkbox');
+            radio.checked = true;
+        }
+
+        function clearModels() {
+            const container = document.getElementById('modelsContainer');
+            container.innerHTML = '';
+        }
+
+        function getModelsData() {
+            const container = document.getElementById('modelsContainer');
+            const models = [];
+            
+            Array.from(container.children).forEach(div => {
+                const input = div.querySelector('.model-input');
+                const radio = div.querySelector('.default-checkbox');
+                const modelName = input.value.trim();
+                
+                if (modelName) {
+                    models.push({
+                        name: modelName,
+                        isDefault: radio.checked
+                    });
+                }
+            });
+            
+            return models;
+        }
+
+        async function selectConfig(configId) {
+            if (configId === activeConfigId) return;
+            
+            const config = allConfigs.find(c => c.id === configId);
+            if (!config) return;
+            
+            // Handle both old and new model formats
+            let models = [];
+            if (config.models && config.models.length > 0) {
+                models = config.models;
+            } else if (config.modelName) {
+                models = [{ name: config.modelName, isDefault: true }];
+            }
+            
+            // If there's only one model, or if it's the old format, activate directly
+            if (models.length <= 1) {
+                try {
+                    const modelName = models.length > 0 ? models[0].name : null;
+                    const result = await window.electronAPI.settings.setActiveConfig(configId, modelName);
+                    if (result.success) {
+                        activeConfigId = configId;
+                        renderConfigurations();
+                    }
+                } catch (error) {
+                    console.error('Failed to set active config:', error);
+                    showStatus('Failed to select configuration', 'error');
+                }
+                return;
+            }
+            
+            // Show model selection interface for multiple models
+            showModelSelectionModal(config, models);
+        }
+        
+        function showModelSelectionModal(config, models) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: #161b22;
+                border: 1px solid #30363d;
+                border-radius: 6px;
+                padding: 20px;
+                max-width: 400px;
+                width: 90%;
+            `;
+            
+            modalContent.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <h3 style="color: #58a6ff; margin-bottom: 8px; font-size: 16px;">Select Model</h3>
+                    <p style="color: #7d8590; font-size: 12px;">Choose which model to use for "${escapeHtml(config.name || 'Unnamed Configuration')}"</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    ${models.map(model => `
+                        <div style="
+                            padding: 10px;
+                            margin-bottom: 8px;
+                            border: 1px solid #30363d;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            background: ${model.isDefault ? 'rgba(35, 134, 54, 0.1)' : '#0d1117'};
+                            border-color: ${model.isDefault ? '#238636' : '#30363d'};
+                        " onclick="selectModelAndActivate('${config.id}', '${escapeHtml(model.name)}')">
+                            <div style="font-weight: 500; color: #c9d1d9; margin-bottom: 2px;">
+                                ${escapeHtml(model.name)}
+                                ${model.isDefault ? '<span style="color: #aff5b4; font-size: 11px; margin-left: 8px;">(Default)</span>' : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="text-align: right;">
+                    <button onclick="closeModelSelectionModal()" style="
+                        background: #21262d;
+                        border: 1px solid #30363d;
+                        color: #c9d1d9;
+                        padding: 8px 16px;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        font-size: 12px;
+                    ">Cancel</button>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModelSelectionModal();
+                }
+            });
+            
+            // Store reference for cleanup
+            modal.id = 'modelSelectionModal';
+        }
+        
+        async function selectModelAndActivate(configId, modelName) {
+            closeModelSelectionModal();
+            
+            try {
+                const result = await window.electronAPI.settings.setActiveConfig(configId, modelName);
+                if (result.success) {
+                    activeConfigId = configId;
+                    renderConfigurations();
+                }
+            } catch (error) {
+                console.error('Failed to set active config:', error);
+                showStatus('Failed to select configuration', 'error');
+            }
+        }
+        
+        function closeModelSelectionModal() {
+            const modal = document.getElementById('modelSelectionModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function deleteConfig(configId) {
+            if (!confirm('Are you sure you want to delete this configuration?')) return;
+            
+            try {
+                const result = await window.electronAPI.settings.deleteConfig(configId);
+                if (result.success) {
+                    await loadAllConfigurations();
+                    
+                } else {
+                    showStatus('Failed to delete configuration', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to delete config:', error);
+                showStatus('Failed to delete configuration', 'error');
+            }
+        }
+
+        function closeForm() {
+            document.getElementById('configForm').style.display = 'none';
+            clearForm();
+            hideStatus();
+        }
+
+        function clearForm() {
+            document.getElementById('apiName').value = '';
+            document.getElementById('apiKey').value = '';
+            document.getElementById('apiUrl').value = '';
+            document.getElementById('providerType').value = 'standard';
+            handleProviderTypeChange(); // Reset UI to cloud defaults
+            clearModels();
+            hideStatus();
+        }
+
+        async function testConnection() {
+            const name = document.getElementById('apiName').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const providerType = document.getElementById('providerType').value;
+            const models = getModelsData();
+
+            // Validation based on provider type
+            if (!apiUrl || models.length === 0) {
+                showStatus('Please fill in URL and at least one Model to test', 'error');
+                return;
+            }
+            
+            // Only require API key for non-Ollama providers when explicitly needed
+            if (providerType !== 'ollama' && !apiKey && (apiUrl.includes('openai.com') || apiUrl.includes('anthropic.com'))) {
+                showStatus('Please fill in API Key for cloud providers', 'error');
+                return;
+            }
+
+            const testBtn = document.getElementById('testBtn');
+            const originalText = testBtn.textContent;
+
+            // Show different message for Ollama due to longer timeout
+            if (providerType === 'ollama') {
+                testBtn.innerHTML = '<span class="spinner"></span>Testing Ollama (may take up to 2 minutes)...';
+                showStatus('⏳ Testing Ollama connection. Large models may take up to 2 minutes...', 'success');
+            } else {
+                testBtn.innerHTML = '<span class="spinner"></span>Testing...';
+            }
+            testBtn.disabled = true;
+
+            try {
+                // Test with the first model
+                const defaultModel = models.find(m => m.isDefault) || models[0];
+                const result = await window.electronAPI.settings.testConnection({
+                    name: name,
+                    apiKey: apiKey,
+                    apiUrl: apiUrl,
+                    modelName: defaultModel.name,
+                    models: models,
+                    providerType: providerType
+                });
+
+                if (result.success) {
+                    if (providerType === 'ollama') {
+                        showStatus(`✓ Ollama connection successful with ${defaultModel.name}!`, 'success');
+                    } else {
+                        showStatus('✓ Connection successful!', 'success');
+                    }
+                } else {
+                    // Provide more helpful error messages for Ollama
+                    let errorMsg = result.error;
+                    if (providerType === 'ollama') {
+                        if (errorMsg.includes('ECONNREFUSED')) {
+                            errorMsg = 'Cannot connect to Ollama. Make sure Ollama is running (try: ollama serve)';
+                        } else if (errorMsg.includes('timed out')) {
+                            errorMsg = `Connection timed out. ${defaultModel.name} may be too large or slow. Try a smaller model.`;
+                        }
+                    }
+                    showStatus('✗ Connection failed: ' + errorMsg, 'error');
+                }
+            } catch (error) {
+                showStatus('✗ Test failed: ' + error.message, 'error');
+            } finally {
+                testBtn.textContent = originalText;
+                testBtn.disabled = false;
+            }
+        }
+
+        async function saveConfiguration() {
+            const name = document.getElementById('apiName').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const providerType = document.getElementById('providerType').value;
+            const models = getModelsData();
+
+            // Validation based on provider type
+            if (!apiUrl || models.length === 0) {
+                showStatus('Please fill in API URL and at least one model', 'error');
+                return;
+            }
+            
+            // No validation needed - API key is always optional now
+
+            const config = {
+                name: name || 'Unnamed Configuration',
+                apiKey: apiKey || '',  // Empty string for local providers
+                apiUrl: apiUrl,
+                providerType: providerType,
+                models: models,
+                savedAt: new Date().toISOString()
+            };
+
+            if (currentEditingId) {
+                config.id = currentEditingId;
+            }
+
+            try {
+                const result = await window.electronAPI.settings.save(config);
+                if (result.success) {
+                    showStatus('✓ Configuration saved successfully!', 'success');
+                    
+                    setTimeout(async () => {
+                        closeForm();
+                        await loadAllConfigurations();
+                        
+                    }, 1000);
+                } else {
+                    showStatus('✗ Failed to save: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('✗ Save failed: ' + error.message, 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(hideStatus, 3000);
+            }
+        }
+
+        function hideStatus() {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.style.display = 'none';
+        }
+
+        function handleProviderTypeChange() {
+            const providerType = document.getElementById('providerType').value;
+            const apiKeyGroup = document.getElementById('apiKeyGroup');
+            const apiUrlInput = document.getElementById('apiUrl');
+            const apiUrlHelp = document.getElementById('apiUrlHelp');
+            const apiNameInput = document.getElementById('apiName');
+
+            switch (providerType) {
+                case 'ollama':
+                    // Update URL placeholder and help text for Ollama
+                    apiUrlInput.placeholder = 'http://localhost:11434/api/generate';
+                    apiUrlHelp.textContent = 'Ollama API endpoint (usually http://localhost:11434/api/generate)';
+                    
+                    // Suggest Ollama naming if empty
+                    if (!apiNameInput.value.trim()) {
+                        apiNameInput.placeholder = 'e.g. Local Ollama - Llama 3.2';
+                    }
+                    
+                    // Add button to fetch available models
+                    addOllamaModelFetcher();
+                    break;
+                    
+                default: // standard
+                    // Update URL placeholder for standard APIs
+                    apiUrlInput.placeholder = 'https://api.openai.com/v1/chat/completions or http://localhost:1234/v1/chat/completions';
+                    apiUrlHelp.textContent = 'API endpoint - cloud (OpenAI, Anthropic) or local (LM Studio, LocalAI, etc.)';
+                    
+                    if (!apiNameInput.value.trim()) {
+                        apiNameInput.placeholder = 'e.g. OpenAI GPT-4, Local LM Studio, Claude';
+                    }
+                    
+                    removeOllamaModelFetcher();
+                    break;
+            }
+        }
+
+        function addOllamaModelFetcher() {
+            // Button removed - users should manually enter Ollama model names
+            // This function is kept empty to avoid breaking existing code
+        }
+
+        function removeOllamaModelFetcher() {
+            const fetchBtn = document.getElementById('fetchOllamaModelsBtn');
+            if (fetchBtn) {
+                fetchBtn.remove();
+            }
+        }
+
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

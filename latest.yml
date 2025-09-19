@@ -1,0 +1,8 @@
+version: 1.0.0
+files:
+  - url: Analytics-Pilot-Setup-1.0.0.exe
+    sha512: [sha512-hash-will-be-generated-by-electron-builder]
+    size: [file-size-in-bytes]
+path: Analytics-Pilot-Setup-1.0.0.exe
+sha512: [sha512-hash-will-be-generated-by-electron-builder]
+releaseDate: '2024-01-01T00:00:00.000Z'

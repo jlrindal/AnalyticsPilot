@@ -1,0 +1,14 @@
+{
+  "version": "1.1.1",
+  "releaseNotes": "New features:\n• Added live connection to Fabric models via XMLA endpoint",
+  "downloadUrl": "https://ewlzjruhuzjypxtdjamv.supabase.co/storage/v1/object/public/app-updates/Analytics%20Pilot%20Setup%201.1.0.exe",
+  "fileSize": "127.02 MB",
+  "mandatory": false,
+  "releaseDate": "2025-09-11T10:00:00Z",
+  "changelog": [
+    "Added automatic update detection",
+    "Improved Supabase integration", 
+    "Fixed PowerBI connection issues",
+    "Enhanced error handling"
+  ]
+}
