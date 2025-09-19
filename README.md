@@ -4,14 +4,14 @@ AI integration for Power BI semantic models
 
 ## Overview
 
-Analytics Pilot is an Electron-based application that provides AI-powered analysis capabilities for Power BI semantic models. It enables users to interact with their Power BI data using natural language queries and AI assistance.
+Analytics Pilot is an Electron-based application that connects your Power BI semantic model to LLM APIs, making natural language DAX generation and streamlined DAX development faster and more efficient.
 
 ## Features
 
 - **Power BI Integration**: Connect to both local Power BI Desktop models and Power BI Service workspaces
-- **AI-Powered Analysis**: Use various AI providers (OpenAI, Anthropic, Google, Ollama) to analyze your data
+- **AI-Powered Analysis**: Use various AI providers (OpenAI, Anthropic, Ollama) to analyze your data
 - **Natural Language Queries**: Generate DAX measures, calculated columns, and tables using natural language
-- **Multiple AI Provider Support**: Configure different AI providers based on your needs
+- **Multiple AI Provider Support**: Configure different AI providers based on your needs, control your token cost (currently, there is no auto-model selection to ensure you are not using too big a model for the job. You should monitor your API costs).
 - **Cross-Platform**: Available for Windows, macOS, and Linux
 
 ## Getting Started
@@ -22,7 +22,7 @@ Analytics Pilot is an Electron-based application that provides AI-powered analys
 - Power BI Desktop (for local model connections)
 - An AI provider API key (optional for local providers like Ollama)
 
-### Installation
+### Installation (this is also available for download at www.AnalyticsPilot.com)
 
 1. Clone the repository:
    ```bash
@@ -47,12 +47,6 @@ To build the application for distribution:
 ```bash
 # For Windows
 npm run dist:win
-
-# For macOS
-npm run dist:mac
-
-# For Linux
-npm run dist:linux
 ```
 
 ## Configuration
@@ -62,12 +56,11 @@ npm run dist:linux
 3. Enter your API credentials and select your preferred AI model
 4. Connect to your Power BI models (local or service)
 
-## Supported AI Providers
+## Supported AI Providers (Tested and working)
 
-- OpenAI (GPT-4, GPT-3.5)
-- Anthropic (Claude)
-- Google (Gemini)
-- Ollama (local models)
+- OpenAI
+- Anthropic
+- Ollama (This is buggy/unstable. If your machine is underpowered, this feature is often useless.)
 - Custom API endpoints
 
 ## License
@@ -86,4 +79,4 @@ For commercial licensing inquiries, please contact Torch Stone LLC or Jeremy Rin
 
 ---
 
-Created by Torch Stone LLC
+Created by Torch Stone LLC // Jeremy Rindal
