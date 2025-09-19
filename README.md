@@ -9,7 +9,7 @@ Analytics Pilot is an Electron-based application that connects your Power BI sem
 ## Features
 
 - **Power BI Integration**: Connect to both local Power BI Desktop models and Power BI Service workspaces
-- **AI-Powered Analysis**: Use various AI providers (OpenAI, Anthropic, Ollama) to analyze your data
+- **AI-Powered Analysis**: Use various AI providers (OpenAI, Anthropic, Ollama) to analyze your model meta-data
 - **Natural Language Queries**: Generate DAX measures, calculated columns, and tables using natural language
 - **Multiple AI Provider Support**: Configure different AI providers based on your needs, control your token cost (currently, there is no auto-model selection to ensure you are not using too big a model for the job. You should monitor your API costs).
 - **Cross-Platform**: Available for Windows, macOS, and Linux
@@ -39,15 +39,6 @@ Analytics Pilot is an Electron-based application that connects your Power BI sem
    ```bash
    npm start
    ```
-
-### Building
-
-To build the application for distribution:
-
-```bash
-# For Windows
-npm run dist:win
-```
 
 ## Configuration
 
